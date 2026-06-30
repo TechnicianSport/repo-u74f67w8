@@ -1,126 +1,88 @@
-import { memo, Suspense, useRef, useEffect, useCallback } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { memo, Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
-import CameraControlsImpl from "camera-controls";
+import { useCountryGeometry } from "../../hooks/useCountryGeometry";
 import { useNewsStore } from "../../store/useNewsStore";
 import { useMapStore } from "../../store/useMapStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
-import { EarthGlobe } from "./EarthGlobe";
-import { CloudsLayer } from "./CloudsLayer";
-import { CountryBorders } from "./CountryBorders";
-import { CountryLabels } from "./CountryLabels";
-import { GlobeStorylineCluster } from "./GlobeStorylineCluster";
-import { GlobeAtmosphere } from "./GlobeAtmosphere";
+import { CountryFloor } from "./CountryFloor";
+import { OceanPlane } from "./OceanPlane";
+import { GridOverlay } from "./GridOverlay";
+import { FlatEarthTexture } from "./FlatEarthTexture";
+import { FlatCountryBorders } from "./FlatCountryBorders";
+import { FlatCountryLabels } from "./FlatCountryLabels";
+import { AtmosphereLayer } from "./AtmosphereLayer";
+import { StorylineCluster } from "./StorylineCluster";
+import { ConnectionsManager } from "./ConnectionsManager";
+import { CameraController } from "./CameraController";
+import { PulseRing } from "../effects/PulseRing";
 import { AmbientParticles } from "../effects/AmbientParticles";
 import { PostProcessingPipeline } from "../effects/PostProcessingPipeline";
-import { getSunDirection } from "../../utils/sunPosition";
-import { GLOBE_RADIUS } from "../../utils/sphereProjection";
-
-CameraControlsImpl.install({ THREE });
-
-const GlobeCameraController = memo(function GlobeCameraController() {
-  const { camera, gl } = useThree();
-  const controlsRef = useRef<CameraControlsImpl | null>(null);
-  const cameraMode = useMapStore((s) => s.cameraMode);
-  const focusTarget = useMapStore((s) => s.focusTarget);
-
-  useEffect(() => {
-    const controls = new CameraControlsImpl(camera, gl.domElement);
-    controls.minDistance = GLOBE_RADIUS + 2;
-    controls.maxDistance = GLOBE_RADIUS * 6;
-    controls.dollyToCursor = false;
-    controls.smoothTime = 0.5;
-    controls.draggingSmoothTime = 0.25;
-    controls.minPolarAngle = 0;
-    controls.maxPolarAngle = Math.PI;
-
-    controls.setLookAt(0, 0, GLOBE_RADIUS * 3.5, 0, 0, 0, false);
-    controlsRef.current = controls;
-
-    return () => {
-      controls.dispose();
-    };
-  }, [camera, gl]);
-
-  useEffect(() => {
-    const controls = controlsRef.current;
-    if (!controls) return;
-
-    if (cameraMode === "overview") {
-      controls.setLookAt(0, 0, GLOBE_RADIUS * 3.5, 0, 0, 0, true);
-    } else if (cameraMode === "focus" && focusTarget) {
-      const [fx, fy, fz] = focusTarget;
-      const dir = new THREE.Vector3(fx, fy, fz).normalize();
-      const camPos = dir.clone().multiplyScalar(GLOBE_RADIUS * 2);
-      controls.setLookAt(camPos.x, camPos.y, camPos.z, 0, 0, 0, true);
-    }
-  }, [cameraMode, focusTarget]);
-
-  useFrame((_, delta) => {
-    controlsRef.current?.update(delta);
-  });
-
-  return null;
-});
-
-const SunLight = memo(function SunLight() {
-  const lightRef = useRef<THREE.DirectionalLight>(null);
-
-  useFrame(() => {
-    if (lightRef.current) {
-      const sun = getSunDirection();
-      lightRef.current.position.copy(sun.multiplyScalar(50));
-    }
-  });
-
-  return (
-    <directionalLight
-      ref={lightRef}
-      intensity={1.5}
-      position={[50, 30, 30]}
-      castShadow
-      shadow-mapSize-width={2048}
-      shadow-mapSize-height={2048}
-    />
-  );
-});
+import { LIGHTING } from "../../constants/mapConfig";
 
 const SceneContent = memo(function SceneContent() {
+  const { projection } = useCountryGeometry();
   const storylines = useNewsStore((s) => s.storylines);
-  const showClouds = useSettingsStore((s) => s.showClouds);
+  const effectsEnabled = useMapStore((s) => s.effectsEnabled);
   const showBorders = useSettingsStore((s) => s.showBorders);
   const showCountryLabels = useSettingsStore((s) => s.showCountryLabels);
   const showAtmosphere = useSettingsStore((s) => s.showAtmosphere);
 
   return (
     <>
-      <GlobeCameraController />
+      <CameraController />
 
-      <ambientLight intensity={0.08} color="#1A1A2E" />
-      <SunLight />
-      <pointLight intensity={0.15} color="#0033FF" position={[0, -10, 0]} />
+      <ambientLight
+        intensity={LIGHTING.ambient.intensity}
+        color={LIGHTING.ambient.color}
+      />
+      <directionalLight
+        intensity={LIGHTING.directional.intensity}
+        position={LIGHTING.directional.position as unknown as THREE.Vector3}
+        castShadow
+        shadow-mapSize-width={LIGHTING.directional.shadowMapSize}
+        shadow-mapSize-height={LIGHTING.directional.shadowMapSize}
+        shadow-camera-far={100}
+        shadow-camera-left={-30}
+        shadow-camera-right={30}
+        shadow-camera-top={30}
+        shadow-camera-bottom={-30}
+      />
+      <pointLight
+        intensity={LIGHTING.point.intensity}
+        color={LIGHTING.point.color}
+        position={LIGHTING.point.position as unknown as THREE.Vector3}
+      />
 
-      <EarthGlobe />
+      <CountryFloor />
 
-      {showClouds && (
-        <Suspense fallback={null}>
-          <CloudsLayer />
-        </Suspense>
-      )}
+      {effectsEnabled.ocean && <OceanPlane />}
 
-      {showBorders && <CountryBorders />}
+      <Suspense fallback={null}>
+        <FlatEarthTexture />
+      </Suspense>
+
+      {showBorders && <FlatCountryBorders />}
 
       {showCountryLabels && (
         <Suspense fallback={null}>
-          <CountryLabels />
+          <FlatCountryLabels />
         </Suspense>
       )}
 
-      <GlobeStorylineCluster storylines={storylines} />
+      {effectsEnabled.grid && <GridOverlay />}
 
-      {showAtmosphere && <GlobeAtmosphere />}
+      <StorylineCluster storylines={storylines} projection={projection} />
+
+      {effectsEnabled.connections && (
+        <ConnectionsManager storylines={storylines} projection={projection} />
+      )}
+
+      <PulseRing />
 
       <AmbientParticles />
+
+      {showAtmosphere && effectsEnabled.atmosphere && <AtmosphereLayer />}
 
       <PostProcessingPipeline />
     </>
@@ -128,18 +90,11 @@ const SceneContent = memo(function SceneContent() {
 });
 
 export const WorldMap = memo(function WorldMap() {
-  const handleCreated = useCallback(
-    (state: { gl: THREE.WebGLRenderer }) => {
-      state.gl.setClearColor("#020408");
-    },
-    []
-  );
-
   return (
     <Canvas
       camera={{
         fov: 45,
-        position: [0, 0, GLOBE_RADIUS * 3.5],
+        position: [0, 18, 24],
         near: 0.1,
         far: 200,
       }}
@@ -149,7 +104,6 @@ export const WorldMap = memo(function WorldMap() {
         toneMapping: THREE.NoToneMapping,
       }}
       dpr={[1, 2]}
-      onCreated={handleCreated}
       style={{
         position: "absolute",
         top: 0,

@@ -111,15 +111,13 @@ export const SettingsPanel = memo(function SettingsPanel() {
   const settingsOpen = useSettingsStore((s) => s.settingsOpen);
   const setSettingsOpen = useSettingsStore((s) => s.setSettingsOpen);
   const toggleSetting = useSettingsStore((s) => s.toggleSetting);
-  const showDayNight = useSettingsStore((s) => s.showDayNight);
-  const showClouds = useSettingsStore((s) => s.showClouds);
   const showBorders = useSettingsStore((s) => s.showBorders);
   const showCountryLabels = useSettingsStore((s) => s.showCountryLabels);
   const showGrid = useSettingsStore((s) => s.showGrid);
   const showAtmosphere = useSettingsStore((s) => s.showAtmosphere);
   const showBloom = useSettingsStore((s) => s.showBloom);
   const showClocks = useSettingsStore((s) => s.showClocks);
-  const showBumpMap = useSettingsStore((s) => s.showBumpMap);
+  const showOcean = useSettingsStore((s) => s.showOcean);
   const categories = useSettingsStore((s) => s.categories);
   const updateCategory = useSettingsStore((s) => s.updateCategory);
   const resetCategories = useSettingsStore((s) => s.resetCategories);
@@ -184,15 +182,13 @@ export const SettingsPanel = memo(function SettingsPanel() {
           <div className="divide-y divide-[#0D2137]/50">
             <div className="px-3 py-2">
               <div className="text-[9px] uppercase text-[#334455] mb-1" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-                Globe Effects
+                Map Layers
               </div>
             </div>
-            <ToggleRow label="Day/Night Terminator" value={showDayNight} onChange={() => toggleSetting("showDayNight")} />
-            <ToggleRow label="Clouds Layer" value={showClouds} onChange={() => toggleSetting("showClouds")} />
-            <ToggleRow label="Bump Map (Terrain)" value={showBumpMap} onChange={() => toggleSetting("showBumpMap")} />
             <ToggleRow label="Country Borders" value={showBorders} onChange={() => toggleSetting("showBorders")} />
             <ToggleRow label="Country Labels" value={showCountryLabels} onChange={() => toggleSetting("showCountryLabels")} />
-            <ToggleRow label="Atmosphere Glow" value={showAtmosphere} onChange={() => toggleSetting("showAtmosphere")} />
+            <ToggleRow label="Ocean" value={showOcean} onChange={() => toggleSetting("showOcean")} />
+            <ToggleRow label="Atmosphere" value={showAtmosphere} onChange={() => toggleSetting("showAtmosphere")} />
             <div className="px-3 py-2">
               <div className="text-[9px] uppercase text-[#334455] mb-1" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
                 Post-Processing
