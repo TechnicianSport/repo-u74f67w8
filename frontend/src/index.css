@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
 
 * {
   margin: 0;
@@ -79,6 +79,17 @@ html, body, #root {
 
 .animate-loading-bar {
   animation: loading-bar 2s ease infinite;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Selection */

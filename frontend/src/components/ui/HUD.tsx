@@ -3,6 +3,7 @@ import { useNewsStore } from "../../store/useNewsStore";
 import { useMapStore } from "../../store/useMapStore";
 import { useModeStore } from "../../store/useModeStore";
 import { useEditorStore } from "../../store/useEditorStore";
+import { useSettingsStore } from "../../store/useSettingsStore";
 import { ModeToggle } from "./ModeToggle";
 import { NewsFeed } from "./NewsFeed";
 import { BreakingAlert } from "./BreakingAlert";
@@ -30,6 +31,8 @@ export const HUD = memo(function HUD() {
   const isEditorMode = useEditorStore((s) => s.isEditorMode);
   const toggleEditor = useEditorStore((s) => s.toggleEditor);
   const toggleEffect = useMapStore((s) => s.toggleEffect);
+  const setSettingsOpen = useSettingsStore((s) => s.setSettingsOpen);
+  const settingsOpen = useSettingsStore((s) => s.settingsOpen);
   const setCameraMode = useMapStore((s) => s.setCameraMode);
   const setSelected = useMapStore((s) => s.setSelected);
   const selectStoryline = useNewsStore((s) => s.selectStoryline);
@@ -173,6 +176,13 @@ export const HUD = memo(function HUD() {
               PAUSED
             </span>
           )}
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="text-[10px] text-[#7799BB] hover:text-white uppercase px-2 py-1 border border-[#0D2137] hover:border-[#1A4A7A] transition-colors"
+            style={{ fontFamily: "'Rajdhani', sans-serif", borderRadius: "3px" }}
+          >
+            &#9881; SETTINGS
+          </button>
         </div>
       </div>
 
