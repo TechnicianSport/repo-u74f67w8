@@ -57,7 +57,7 @@ export const CONNECTION_CONFIG = {
 };
 
 export const LIGHTING = {
-  ambient: { intensity: 0.15, color: "#1A1A2E" },
+  ambient: { intensity: 0.6, color: "#CCCCDD" },
   directional: { intensity: 1.2, position: [50, 80, 30] as const, shadowMapSize: 4096 },
   point: { intensity: 0.3, color: "#0033FF", position: [0, -5, 0] as const },
 };

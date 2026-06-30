@@ -27,6 +27,7 @@ const SceneContent = memo(function SceneContent() {
   const showBorders = useSettingsStore((s) => s.showBorders);
   const showCountryLabels = useSettingsStore((s) => s.showCountryLabels);
   const showAtmosphere = useSettingsStore((s) => s.showAtmosphere);
+  const showOcean = useSettingsStore((s) => s.showOcean);
 
   return (
     <>
@@ -56,7 +57,7 @@ const SceneContent = memo(function SceneContent() {
 
       <CountryFloor />
 
-      {effectsEnabled.ocean && <OceanPlane />}
+      {showOcean && effectsEnabled.ocean && <OceanPlane />}
 
       <Suspense fallback={null}>
         <FlatEarthTexture />

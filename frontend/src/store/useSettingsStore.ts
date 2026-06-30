@@ -112,7 +112,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   showGrid: loadPersisted("lnm_grid", false),
   showAtmosphere: loadPersisted("lnm_atmosphere", true),
   showBloom: loadPersisted("lnm_bloom", true),
-  showOcean: true,
+  showOcean: false,
   showClocks: loadPersisted("lnm_clocks", true),
   showBumpMap: loadPersisted("lnm_bump", true),
   settingsOpen: false,
